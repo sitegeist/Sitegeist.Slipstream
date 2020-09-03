@@ -3,7 +3,12 @@
     "type": "neos-package",
     "name": "sitegeist/slipstream",
     "require": {
-        "neos/flow": "*"
+        "neos/flow": "^6.0 || dev-master",
+        "neos/neos": "*"
+    },
+    "suggest": {
+        "sitegeist/monocle": "*",
+        "flowpack/fullpagecache": "*"
     },
     "autoload": {
         "psr-4": {

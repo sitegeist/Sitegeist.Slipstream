@@ -1,0 +1,24 @@
+prototype(Neos.Neos:Page) {
+    head  {
+        slipstreamAnchorEnd = Neos.Fusion:Tag {
+            @position = 'end'
+            tagName = "meta"
+            attributes.type = "slipstreamAnchor"
+            attributes.value = "headerEnd"
+        }
+    }
+
+    slipstreamAnchorStart = Neos.Fusion:Tag {
+        @position = 'body body'
+        tagName = "meta"
+        attributes.type = "slipstreamAnchor"
+        attributes.value = "bodyStart"
+    }
+
+    slipstreamAnchorEnd = Neos.Fusion:Tag {
+        @position = 'before closingBodyTag'
+        tagName = "meta"
+        attributes.type = "slipstreamAnchor"
+        attributes.value = "bodyEnd"
+    }
+}

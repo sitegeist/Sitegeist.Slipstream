@@ -1,0 +1,14 @@
+Neos:
+  Neos:
+    fusion:
+      autoInclude:
+        Sitegeist.Slipstream: true
+
+  Flow:
+    http:
+      chain:
+        'process':
+          chain:
+            'slipstream':
+              position: 'after setHeaders'
+              component: 'Sitegeist\Slipstream\Http\SlipStreamComponent'
