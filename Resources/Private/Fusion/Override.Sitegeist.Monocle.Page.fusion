@@ -1,4 +1,7 @@
 prototype(Sitegeist.Monocle:Preview.Page) {
+
+    httpResponseHead.headers.X-Slipstream-Enabled = "true"
+
     head  {
         slipstreamAnchorEnd = Neos.Fusion:Tag {
             @position = 'end'
