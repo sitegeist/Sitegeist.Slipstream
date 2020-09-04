@@ -51,7 +51,7 @@ and mitigate the small performance drawback.
 
 ## Installation
 
-Sitegeist.Slipstream ~~is~~ will evntually be available via packagist run `composer require sitegeist/slipstream`.
+Sitegeist.Slipstream ~~is~~ will eventually be available via packagist run `composer require sitegeist/slipstream`.
 
 We use semantic-versioning so every breaking change will increase the major-version number.
 
