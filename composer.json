@@ -2,6 +2,7 @@
     "description": "",
     "type": "neos-package",
     "name": "sitegeist/slipstream",
+    "license": "GPL-3.0-or-later",
     "require": {
         "php": "^7.2",
         "neos/flow": "^6.0 || dev-master",
