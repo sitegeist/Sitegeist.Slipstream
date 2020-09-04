@@ -3,6 +3,7 @@
     "type": "neos-package",
     "name": "sitegeist/slipstream",
     "require": {
+        "php": "^7.2",
         "neos/flow": "^6.0 || dev-master",
         "neos/neos": "*"
     },

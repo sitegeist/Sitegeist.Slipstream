@@ -9,7 +9,11 @@ use function GuzzleHttp\Psr7\stream_for;
 class SlipStreamComponent implements ComponentInterface
 {
 
-    protected $debugMode = true;
+    /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="debugMode")
+     */
+    protected $debugMode;
 
     /**
      * Just call makeStandardsCompliant on the Response for now
@@ -21,7 +25,7 @@ class SlipStreamComponent implements ComponentInterface
     {
         $response = $componentContext->getHttpResponse();
 
-        if ($response->getHeaderLine('X-Slipstream-Enabled') !== 'true') {
+        if ($response->getHeaderLine('X-Slipstream') !== 'enabled') {
             return;
         }
 
@@ -44,49 +48,44 @@ class SlipStreamComponent implements ComponentInterface
 
         $xPath = new \DOMXPath($domDocument);
 
-        $slipstreamNodes = $xPath->query("//*[@data-slipstream-anchor]");
-        $nodesToMove = [];
-        foreach ($slipstreamNodes as $node) {
+        $sourceNodes = $xPath->query("//*[@data-slipstream]");
+        $nodesByTargetAndContentHash = [];
+        foreach ($sourceNodes as $node) {
             /**
              * @var \DOMNode $node
              */
             $content = $domDocument->saveHTML($node);
+            $target = $node->getAttribute('data-slipstream');
+            if (empty($target)) {
+                $target = '//head';
+            }
             $contentHash = md5($content);
-            $nodesToMove[$contentHash] = $node->cloneNode(true);
+            $nodesByTargetAndContentHash[$target][$contentHash] = $node->cloneNode(true);
 
             // in debug mode leave a comment behind
             if ($this->debugMode) {
-                $comment = $domDocument->createComment($content);
+                $comment = $domDocument->createComment(' ' . $content . ' ') ;
                 $node->parentNode->insertBefore($comment, $node);
             }
 
             $node->parentNode->removeChild($node);
         }
 
-        $anchorChildren = [];
-        foreach ($nodesToMove as $node) {
-            /**
-             * @var \DOMNode $node
-             */
-            $anchorName = $node->getAttribute('data-slipstream-anchor');
-            $node->removeAttribute('data-slipstreamAnchor');
-            $anchorChildren[$anchorName][] = $node;
-        }
-
-        $anchorNodes = $xPath->query("//meta[@type='slipstreamAnchor']");
-        foreach ($anchorNodes as $node) {
-            /**
-             * @var \DOMNode $node
-             */
-            $anchorName = $node->getAttribute('value');
-            if (array_key_exists($anchorName, $anchorChildren)) {
-                foreach ($anchorChildren[$anchorName] as $anchorNode) {
-                    $node->parentNode->insertBefore($anchorNode, $node);
+        foreach ($nodesByTargetAndContentHash as $targetPath => $nodes){
+            $query =$xPath->query($targetPath);
+            if ($query && $query->count()) {
+                $targetNode = $query->item(0);
+                if ($this->debugMode) {
+                    $targetNode->appendChild($domDocument->createComment(' slipstream-for: ' . $targetPath . ' begin '));
+                }
+                foreach ($nodes as $anchorNode) {
+                    $targetNode->appendChild($anchorNode);
+                }
+                if ($this->debugMode) {
+                    $targetNode->appendChild($domDocument->createComment(' slipstream-for: ' . $targetPath . ' end '));
                 }
             }
-            $node->parentNode->removeChild($node);
         }
-
 
         $alteredBody = $domDocument->saveHTML();
 
@@ -96,7 +95,9 @@ class SlipStreamComponent implements ComponentInterface
         }
 
         $response = $response->withBody(stream_for($alteredBody));
-        $response = $response->withAddedHeader("yolo", "yolo");
+        if (!$this->debugMode) {
+            $response = $response->withoutHeader('X-Slipstream-Enabled');
+        }
 
         $componentContext->replaceHttpResponse($response);
 

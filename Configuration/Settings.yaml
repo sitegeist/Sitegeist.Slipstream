@@ -12,3 +12,7 @@ Neos:
             'slipstream':
               position: 'after setHeaders'
               component: 'Sitegeist\Slipstream\Http\SlipStreamComponent'
+
+Sitegeist:
+  Slipstream:
+    debugMode: false

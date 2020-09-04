@@ -1,27 +1,3 @@
 prototype(Neos.Neos:Page) {
-
-    httpResponseHead.headers.X-Slipstream-Enabled = "true"
-
-    head  {
-        slipstreamAnchorEnd = Neos.Fusion:Tag {
-            @position = 'end'
-            tagName = "meta"
-            attributes.type = "slipstreamAnchor"
-            attributes.value = "headerEnd"
-        }
-    }
-
-    slipstreamAnchorStart = Neos.Fusion:Tag {
-        @position = 'before body'
-        tagName = "meta"
-        attributes.type = "slipstreamAnchor"
-        attributes.value = "bodyStart"
-    }
-
-    slipstreamAnchorEnd = Neos.Fusion:Tag {
-        @position = 'before closingBodyTag'
-        tagName = "meta"
-        attributes.type = "slipstreamAnchor"
-        attributes.value = "bodyEnd"
-    }
+    httpResponseHead.headers.X-Slipstream = "enabled"
 }
