@@ -20,7 +20,7 @@ by our employer http://www.sitegeist.de.*
 You can mark any html fragment to be moved to the head of the document by 
 adding a `data-slipstream` attribute.
 
-```
+```html
     <script data-slipstream href="yourCustomSCript.js" />
     <div>your component</div>
 ```
@@ -31,10 +31,13 @@ is added to the header.
 
 By defining the `data-slipstream` attribute with an xpath the target can be altered. 
 
-```
+```html
     <script data-slipstream="//body" href="yourCustomSCript.js" />
     <div>your component</div>
 ```
+
+When the setting `Sitegeist.Slipstream.debugMode` is enabled html comments are rendered to mark where tags were removed
+and inserted. This is enabled in Development Context by default.
 
 ## Inner working and performance
 
