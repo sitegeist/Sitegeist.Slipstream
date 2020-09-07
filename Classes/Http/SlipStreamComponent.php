@@ -87,11 +87,10 @@ class SlipStreamComponent implements ComponentInterface
             }
         }
 
-        $alteredBody = $domDocument->saveHTML();
-
-        // remove the xml declaration that was only added for the dom parser
-        if (!$hasXmlDeclaration) {
-           $alteredBody = substr($alteredBody, 40);
+        if ($hasXmlDeclaration) {
+            $alteredBody = $domDocument->saveHTML();
+        } else {
+            $alteredBody = $domDocument->saveHTML($domDocument->documentElement);
         }
 
         $response = $response->withBody(stream_for($alteredBody));
