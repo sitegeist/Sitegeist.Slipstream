@@ -2,11 +2,9 @@
 
 "Quantum slipstream transcends the normal warp barrier by penetrating the quantum barrier with a focused quantum field."
 
-The slipstream package allows to render tags that are later deduplicated and moved to another position like the document 
-header. This allows to define additional the JS and CSS requirements directly with the fusion components. 
+The slipstream package allows to define header requirements with presentational fusion. This is done by labeling the tags with a special attribute. They are later deduplicated and moved to another position like the document header. This allows to define additional the JS and CSS requirements directly with the fusion components. 
 
-The deduplication and node-transfer happens in a dedicated http-component to ensure the fusion caching still works as    
-expected.
+The deduplication and node-transfer happens in a dedicated http-component to ensure the fusion caching still works as expected.
 
 ### Authors & Sponsors
 
@@ -51,7 +49,7 @@ and mitigate the small performance drawback.
 
 ## Installation
 
-Sitegeist.Slipstream ~~is~~ will eventually be available via packagist run `composer require sitegeist/slipstream`.
+Sitegeist.Slipstream is available via packagist run `composer require sitegeist/slipstream`.
 
 We use semantic-versioning so every breaking change will increase the major-version number.
 
