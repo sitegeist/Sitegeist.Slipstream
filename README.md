@@ -1,10 +1,9 @@
 # Sitegeist.Slipstream
+## Header requirements for presentational fusion
 
 "Quantum slipstream transcends the normal warp barrier by penetrating the quantum barrier with a focused quantum field."
 
-The slipstream package allows to define header requirements with presentational fusion. This is done by labeling the tags with a special attribute. They are later deduplicated and moved to another position like the document header. This allows to define additional the JS and CSS requirements directly with the fusion components. 
-
-The deduplication and node-transfer happens in a dedicated http-component to ensure the fusion caching still works as expected.
+The slipstream package allows to define header requirements with presentational fusion by labeling the required tags with a special attribute. They are later deduplicated and moved to the target position. This allows to define additional the JS and CSS requirements directly with the presentational fusion components. 
 
 ### Authors & Sponsors
 
