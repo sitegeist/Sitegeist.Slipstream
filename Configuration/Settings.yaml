@@ -6,13 +6,12 @@ Neos:
 
   Flow:
     http:
-      chain:
-        'process':
-          chain:
-            'slipstream':
-              position: 'after setHeaders'
-              component: 'Sitegeist\Slipstream\Http\SlipStreamComponent'
+      middlewares:
+        slipstream:
+          position: 'before dispatch'
+          middleware: 'Sitegeist\Slipstream\Middleware\SlipstreamMiddleware'
 
 Sitegeist:
   Slipstream:
     debugMode: false
+

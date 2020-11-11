@@ -5,8 +5,7 @@
     "license": "GPL-3.0-or-later",
     "require": {
         "php": "^7.2",
-        "neos/flow": "^6.0 || dev-master",
-        "neos/neos": "*"
+        "neos/flow": "^7.0 || dev-master"
     },
     "suggest": {
         "sitegeist/monocle": "*",
