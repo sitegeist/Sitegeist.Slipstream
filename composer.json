@@ -4,7 +4,6 @@
     "name": "sitegeist/slipstream",
     "license": "GPL-3.0-or-later",
     "require": {
-        "php": "^7.2",
         "neos/flow": "^7.0 || dev-master"
     },
     "suggest": {
