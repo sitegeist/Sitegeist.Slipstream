@@ -93,16 +93,18 @@ class SlipStreamService
             }
             $query = $xPath->query($targetPath);
             if ($query && $query->count()) {
+                $hasPrepend = count($prepend);
+                $hasAppend = count($append);
                 $targetNode = $query->item(0);
-                if (count($prepend)) {
+                if ($hasPrepend) {
                     $firstChildNode = $targetNode->firstChild;
                 }
                 if ($this->debugMode) {
                     $comment = 'slipstream-for: ' . $targetPath . ' ';
-                    if (count($prepend)) {
+                    if ($hasPrepend) {
                         $targetNode->insertBefore($domDocument->createComment($comment . 'prepend begin'), $firstChildNode);
                     }
-                    if (count($append)) {
+                    if ($hasAppend) {
                         $targetNode->appendChild($domDocument->createComment($comment . 'begin'));
                     }
                 }
@@ -114,10 +116,10 @@ class SlipStreamService
                 }
 
                 if ($this->debugMode) {
-                    if (count($prepend)) {
+                    if ($hasPrepend) {
                         $targetNode->insertBefore($domDocument->createComment($comment . 'prepend end'), $firstChildNode);
                     }
-                    if (count($append)) {
+                    if ($hasAppend) {
                         $targetNode->appendChild($domDocument->createComment($comment . 'end'));
                     }
                 }
