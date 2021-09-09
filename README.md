@@ -18,7 +18,7 @@ You can mark any html fragment to be moved to the head of the document by
 adding a `data-slipstream` attribute.
 
 ```html
-    <script data-slipstream href="yourCustomSCript.js" />
+    <script data-slipstream src="yourCustomSCript.js" />
     <div>your component</div>
 ```
 
@@ -29,7 +29,7 @@ is added to the header.
 By defining the `data-slipstream` attribute with an xpath the target can be altered. 
 
 ```html
-    <script data-slipstream="//body" href="yourCustomSCript.js" />
+    <script data-slipstream="//body" src="yourCustomSCript.js" />
     <div>your component</div>
 ```
 
