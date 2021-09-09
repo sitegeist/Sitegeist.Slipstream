@@ -82,23 +82,26 @@ class SlipStreamService
         }
 
         foreach ($nodesByTargetAndContentHash as $targetPath => $configurations) {
-            $prepend = [];
-            $append = [];
-            foreach ($configurations as $config) {
-                if ($config['prepend']) {
-                    $prepend[] = $config['node'];
-                } else {
-                    $append[] = $config['node'];
-                }
-            }
             $query = $xPath->query($targetPath);
             if ($query && $query->count()) {
+                $targetNode = $query->item(0);
+
+                $prepend = [];
+                $append = [];
+                foreach ($configurations as $config) {
+                    if ($config['prepend']) {
+                        $prepend[] = $config['node'];
+                    } else {
+                        $append[] = $config['node'];
+                    }
+                }
                 $hasPrepend = count($prepend);
                 $hasAppend = count($append);
-                $targetNode = $query->item(0);
+
                 if ($hasPrepend) {
                     $firstChildNode = $targetNode->firstChild;
                 }
+
                 if ($this->debugMode) {
                     $comment = 'slipstream-for: ' . $targetPath . ' ';
                     if ($hasPrepend) {
@@ -108,6 +111,7 @@ class SlipStreamService
                         $targetNode->appendChild($domDocument->createComment($comment . 'begin'));
                     }
                 }
+
                 foreach ($prepend as $node) {
                     $targetNode->insertBefore($node, $firstChildNode);
                 }
