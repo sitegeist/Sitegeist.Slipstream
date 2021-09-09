@@ -15,6 +15,12 @@ class SlipStreamService
     protected $debugMode;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="removeSlipstreamAttributes")
+     */
+    protected $removeAttributes;
+
+    /**
      * Modify the given response and return a new one with the data-slipstream elements moved to
      * the target location
      *
@@ -53,30 +59,67 @@ class SlipStreamService
             if (empty($target)) {
                 $target = '//head';
             }
+
+            $prepend = $node->hasAttribute('data-slipstream-prepend');
             $contentHash = md5($content);
-            $nodesByTargetAndContentHash[$target][$contentHash] = $node->cloneNode(true);
+            $clone = $node->cloneNode(true);
+            if ($this->removeAttributes) {
+                $clone->removeAttribute('data-slipstream');
+                $clone->removeAttribute('data-slipstream-prepend');
+            }
+            $nodesByTargetAndContentHash[$target][$contentHash] = [
+                'prepend' => $prepend,
+                'node' => $clone
+            ];
 
             // in debug mode leave a comment behind
             if ($this->debugMode) {
-                $comment = $domDocument->createComment(' ' . $content . ' ') ;
+                $comment = $domDocument->createComment(' ' . $content . ' ');
                 $node->parentNode->insertBefore($comment, $node);
             }
 
             $node->parentNode->removeChild($node);
         }
 
-        foreach ($nodesByTargetAndContentHash as $targetPath => $nodes){
+        foreach ($nodesByTargetAndContentHash as $targetPath => $configurations) {
+            $prepend = [];
+            $append = [];
+            foreach ($configurations as $config) {
+                if ($config['prepend']) {
+                    $prepend[] = $config['node'];
+                } else {
+                    $append[] = $config['node'];
+                }
+            }
             $query = $xPath->query($targetPath);
             if ($query && $query->count()) {
                 $targetNode = $query->item(0);
-                if ($this->debugMode) {
-                    $targetNode->appendChild($domDocument->createComment(' slipstream-for: ' . $targetPath . ' begin '));
-                }
-                foreach ($nodes as $anchorNode) {
-                    $targetNode->appendChild($anchorNode);
+                if (count($prepend)) {
+                    $firstChildNode = $targetNode->firstChild;
                 }
                 if ($this->debugMode) {
-                    $targetNode->appendChild($domDocument->createComment(' slipstream-for: ' . $targetPath . ' end '));
+                    $comment = 'slipstream-for: ' . $targetPath . ' ';
+                    if (count($prepend)) {
+                        $targetNode->insertBefore($domDocument->createComment($comment . 'prepend begin'), $firstChildNode);
+                    }
+                    if (count($append)) {
+                        $targetNode->appendChild($domDocument->createComment($comment . 'begin'));
+                    }
+                }
+                foreach ($prepend as $node) {
+                    $targetNode->insertBefore($node, $firstChildNode);
+                }
+                foreach ($append as $node) {
+                    $targetNode->appendChild($node);
+                }
+
+                if ($this->debugMode) {
+                    if (count($prepend)) {
+                        $targetNode->insertBefore($domDocument->createComment($comment . 'prepend end'), $firstChildNode);
+                    }
+                    if (count($append)) {
+                        $targetNode->appendChild($domDocument->createComment($comment . 'end'));
+                    }
                 }
             }
         }
