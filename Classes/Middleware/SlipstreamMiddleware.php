@@ -15,13 +15,13 @@ class SlipstreamMiddleware implements MiddlewareInterface
      * @var SlipStreamService
      * @Flow\Inject
      */
-    protected $slipStramService;
+    protected $slipStreamService;
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         $response = $next->handle($request);
         if ($response->getHeaderLine('X-Slipstream') == 'enabled') {
-            return $this->slipStramService->processResponse($response);
+            return $this->slipStreamService->processResponse($response);
         } else {
             return $response;
         }
