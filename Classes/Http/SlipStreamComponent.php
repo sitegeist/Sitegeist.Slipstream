@@ -19,7 +19,7 @@ class SlipStreamComponent implements ComponentInterface
      * @var SlipStreamService
      * @Flow\Inject
      */
-    protected $slipStramService;
+    protected $slipStreamService;
 
     /**
      * Just call makeStandardsCompliant on the Response for now
@@ -31,7 +31,7 @@ class SlipStreamComponent implements ComponentInterface
     {
         $response = $componentContext->getHttpResponse();
         if ($response->getHeaderLine('X-Slipstream') == 'enabled') {
-            $response = $this->slipStramService->processResponse($response);
+            $response = $this->slipStreamService->processResponse($response);
             $componentContext->replaceHttpResponse($response);
         }
     }

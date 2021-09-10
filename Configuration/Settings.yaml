@@ -16,3 +16,4 @@ Neos:
 Sitegeist:
   Slipstream:
     debugMode: false
+    removeSlipstreamAttributes: true
