@@ -1,3 +1,4 @@
 Sitegeist:
   Slipstream:
     debugMode: true
+    removeSlipstreamAttributes: false
