@@ -31,8 +31,8 @@ class SlipStreamService
     {
         $html = $response->getBody()->getContents();
 
-        // detect xml declaration
-        $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml');
+        // detect xml or html declaration
+        $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml') || (substr($html, 0, 15) === '<!DOCTYPE html>');
 
         // ignore xml parsing errors
         $useInternalErrorsBackup = libxml_use_internal_errors(true);
