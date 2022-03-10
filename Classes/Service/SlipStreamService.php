@@ -30,6 +30,7 @@ class SlipStreamService
     public function processResponse(ResponseInterface $response): ResponseInterface
     {
         $html = $response->getBody()->getContents();
+        $html = str_replace('@', '__internal_at__', $html);
 
         // detect xml or html declaration
         $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml') || (substr($html, 0, 15) === '<!DOCTYPE html>');
@@ -135,6 +136,8 @@ class SlipStreamService
         } else {
             $alteredBody = $domDocument->saveHTML($domDocument->documentElement);
         }
+
+        $alteredBody = str_replace('__internal_at__', '@', $alteredBody);
 
         $response = $response->withBody(stream_for($alteredBody));
         if (!$this->debugMode) {
