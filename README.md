@@ -1,4 +1,5 @@
 # Sitegeist.Slipstream
+
 ## Header requirements for presentational fusion
 
 "Quantum slipstream transcends the normal warp barrier by penetrating the quantum barrier with a focused quantum field."
@@ -26,7 +27,7 @@ The slipstream middleware will parse the entire page and detect all those tags. 
 location and are appended to the header. Every tag is added only once, so if multiple components require the same JS, only one 
 is added to the given location.
 
-By defining the `data-slipstream` attribute with an xpath, the target can be altered. 
+By defining the `data-slipstream` attribute with an XPath, the target can be altered. 
 
 ```html
     <script data-slipstream="//body" src="yourCustomScript.js"></script>
@@ -49,7 +50,7 @@ This is disabled in Development Context by default.
 
 The slipstream HTTP middleware will modify all responses with an active `X-Slipstream: Enabled` HTTP header.
 This header is added to Neos.Neos:Page and Sitegeist.Monocle:Preview.Page already, so this will work for
-Neos and Monocle right away. For other controllers, you will have to add the header `X-Slipstream: Enabled` manually.
+Neos and Monocle right away. You will have to add the header `X-Slipstream: Enabled` for other controllers.
 
 Since the response body is parsed and modified, this adds a minor performance penalty to every request. However
 the package is designed to work together with Flowpack.FullpageCache, which will in turn cache the whole result 
@@ -59,7 +60,7 @@ and mitigate the slight performance drawback.
 
 Sitegeist.Slipstream is available via packagist run `composer require sitegeist/slipstream`.
 
-We use semantic-versioning, so every breaking change will increase the major version number.
+We use semantic-versioning so that every breaking change will increase the major version number.
 
 ## Contribution
 
