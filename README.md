@@ -10,8 +10,8 @@ The slipstream package allows defining header requirements with presentational f
 
 * Martin Ficzel - ficzel@sitegeist.de
 
-*The development and the public-releases of this package is generously sponsored
-by our employer <http://www.sitegeist.de>.*
+*The development and the public releases of this package is generously sponsored
+by our employer http://www.sitegeist.de.*
 
 ## Usage
 
@@ -27,7 +27,7 @@ The slipstream component will parse the entire page and detect all those tags. T
 location and are appended to the header. Every tag is added only once, so if multiple components require the same JS, only one
 is added to the given location.
 
-By defining the `data-slipstream` attribute with an xpath, the target can be altered.
+By defining the `data-slipstream` attribute with an XPath, the target can be altered.
 
 ```html
     <script data-slipstream="//body" src="yourCustomScript.js"></script>
@@ -48,19 +48,19 @@ This is disabled in Development Context by default.
 
 ## Inner working and performance
 
-The slipstream http-component will modify all responses with active `X-Slipstream: Enabled` http header.
-This header is added to Neos.Neos:Page and Sitegeist.Monocle:Preview.Page already so this will work for
-neos and monocle right away. For other controllers you will have to add the `X-Slipstream: Enabled` manually.
+The slipstream http-component will modify all responses with an active `X-Slipstream: Enabled` http header.
+This header is added to Neos.Neos:Page and Sitegeist.Monocle:Preview.Page already, so this will work for
+neos and monocle right away. You will have to add the `X-Slipstream: Enabled` for other controllers.
 
-Since the response body is parsed and modified this adds a small performance penalty to every reqest. However
-the package is designed to work together with Flowpack.FullpageCache which will im turn cache the whole result
-and mitigate the small performance drawback.
+Since the response body is parsed and modified, this adds a minor performance penalty to every request. However
+the package is designed to work together with Flowpack.FullpageCache, which will in turn cache the whole result
+and mitigate the slight performance drawback.
 
 ## Installation
 
 Sitegeist.Slipstream is available via packagist run `composer require "sitegeist/slipstream:^1.0"`.
 
-We use semantic-versioning so every breaking change will increase the major-version number.
+We use semantic-versioning so that every breaking change will increase the major version number.
 
 ## Contribution
 
