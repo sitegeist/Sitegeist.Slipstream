@@ -4,8 +4,7 @@
     "name": "sitegeist/slipstream",
     "license": "GPL-3.0-or-later",
     "require": {
-        "neos/flow": "^7.0 || dev-master",
-        "neos/neos": "^7.0 || dev-master"
+        "neos/flow": "^7.0 || dev-master"
     },
     "suggest": {
         "sitegeist/monocle": "*",
@@ -18,7 +17,12 @@
     },
     "extra": {
         "neos": {
-            "package-key": "Sitegeist.Slipstream"
+            "package-key": "Sitegeist.Slipstream",
+            "loading-order": {
+                "after": [
+                    "neos/neos"
+                ]
+            }
         }
     }
 }
