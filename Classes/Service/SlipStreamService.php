@@ -138,7 +138,7 @@ class SlipStreamService
 
         $response = $response->withBody(stream_for($alteredBody));
         if (!$this->debugMode) {
-            $response = $response->withoutHeader('X-Slipstream-Enabled');
+            $response = $response->withoutHeader('X-Slipstream');
         }
 
         // restore previous parsing behavior
