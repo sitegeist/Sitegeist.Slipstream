@@ -3,7 +3,7 @@ namespace Sitegeist\Slipstream\Service;
 
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Psr7\stream_for;
+use GuzzleHttp\Psr7\Utils;
 
 class SlipStreamService
 {
@@ -136,7 +136,7 @@ class SlipStreamService
             $alteredBody = $domDocument->saveHTML($domDocument->documentElement);
         }
 
-        $response = $response->withBody(stream_for($alteredBody));
+        $response = $response->withBody(Utils::streamFor($alteredBody));
         if (!$this->debugMode) {
             $response = $response->withoutHeader('X-Slipstream');
         }
