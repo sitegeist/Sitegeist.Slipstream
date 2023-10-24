@@ -21,7 +21,9 @@ class SlipStreamService
     protected $removeAttributes;
 
 
-    protected const AT_CHARACTER_REPLACEMENT = '__internal_at__';
+    protected const AT_CHARACTER_REPLACEMENT = ' __internal_at__';
+
+    protected const AT_CHARACTER_SEARCH = ' @';
 
     /**
      * Modify the given response and return a new one with the data-slipstream elements moved to
@@ -36,7 +38,7 @@ class SlipStreamService
 
         // Starting with Neos 7.3 it is possible to have attributes with @ (e.g. @click).
         // This replacement preserves attributes with @ character
-        $html = str_replace('@', self::AT_CHARACTER_REPLACEMENT, $html);
+        $html = str_replace(self::AT_CHARACTER_SEARCH, self::AT_CHARACTER_REPLACEMENT, $html);
 
         // detect xml or html declaration
         $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml') || (substr($html, 0, 15) === '<!DOCTYPE html>');
@@ -144,7 +146,7 @@ class SlipStreamService
         }
 
         // Replace the interal @ character with the original one
-        $alteredBody = str_replace(self::AT_CHARACTER_REPLACEMENT, '@', $alteredBody);
+        $alteredBody = str_replace(self::AT_CHARACTER_REPLACEMENT, self::AT_CHARACTER_SEARCH, $alteredBody);
 
         $response = $response->withBody(Utils::streamFor($alteredBody));
         if (!$this->debugMode) {
