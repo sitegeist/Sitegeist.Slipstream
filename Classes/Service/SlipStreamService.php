@@ -68,6 +68,9 @@ class SlipStreamService
             if (empty($target)) {
                 $target = '//head';
             }
+            if (!str_starts_with($target, '/') && class_exists('Gt\CssXPath\Translator', true)) {
+                $target = (string)new \Gt\CssXPath\Translator($target);
+            }
 
             $prepend = $node->hasAttribute('data-slipstream-prepend');
             $contentHash = md5($content);

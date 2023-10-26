@@ -8,7 +8,8 @@
     },
     "suggest": {
         "sitegeist/monocle": "*",
-        "flowpack/fullpagecache": "*"
+        "flowpack/fullpagecache": "*",
+        "phpgt/cssxpath": "CSS selector support for the Sitegeist.Slipstream"
     },
     "autoload": {
         "psr-4": {
