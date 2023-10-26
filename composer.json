@@ -1,5 +1,5 @@
 {
-    "description": "",
+    "description": "Teleport any HTML tag to antoher place of the document. Mostly used for CSS and JS",
     "type": "neos-package",
     "name": "sitegeist/slipstream",
     "license": "GPL-3.0-or-later",
@@ -7,8 +7,8 @@
         "neos/flow": "^7.0 || ^8.0 || dev-master"
     },
     "suggest": {
-        "sitegeist/monocle": "*",
-        "flowpack/fullpagecache": "*"
+        "sitegeist/monocle": "An living-styleguide for Neos that is based on the actual fusion-code",
+        "flowpack/fullpagecache": "Cache full Neos page responses"
     },
     "autoload": {
         "psr-4": {
