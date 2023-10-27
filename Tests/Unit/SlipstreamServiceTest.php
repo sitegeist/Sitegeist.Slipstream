@@ -207,6 +207,66 @@ class SlipstreamServiceTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function specialCharactersWorkInContentAndSlipstreamWithDoctype() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <!DOCTYPE html>
+            <html>
+                <head></head>
+                <body>
+                    fooÄÖÜ<div data-slipstream>slipped content ÄÖÜ</div>barÄÖÜ
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <!DOCTYPE html><html>
+                <head><div data-slipstream>slipped content ÄÖÜ</div></head>
+                <body>
+                    fooÄÖÜbarÄÖÜ
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function specialCharactersWorkInContentAndSlipstreamWithoutDoctype() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    fooÄÖÜ<div data-slipstream>slipped content ÄÖÜ</div>barÄÖÜ
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head><div data-slipstream>slipped content ÄÖÜ</div></head>
+                <body>
+                    fooÄÖÜbarÄÖÜ
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+
     public function createService(bool $debugMode = false, bool $removeAttributes = false): SlipStreamService
     {
         $service = new SlipStreamService();

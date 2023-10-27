@@ -25,6 +25,8 @@ class SlipStreamService
 
     protected const AT_CHARACTER_SEARCH = ' @';
 
+    protected const HTML_DOCTYPE = '<!DOCTYPE html>';
+
     /**
      * Modify the given response and return a new one with the data-slipstream elements moved to
      * the target location
@@ -61,8 +63,11 @@ class SlipStreamService
         // This replacement preserves attributes with @ character
         $html = str_replace(self::AT_CHARACTER_SEARCH, self::AT_CHARACTER_REPLACEMENT, $html);
 
-        // detect xml or html declaration
-        $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml') || (substr($html, 0, 15) === '<!DOCTYPE html>');
+        // detect html doctype
+        $hasHtmlDoctype = substr($html, 0, 15) === self::HTML_DOCTYPE;
+
+        // detect xml declaration
+        $hasXmlDeclaration = substr($html, 0, 5) === '<?xml';
 
         // ignore xml parsing errors
         $useInternalErrorsBackup = libxml_use_internal_errors(true);
@@ -153,6 +158,7 @@ class SlipStreamService
                         $nodeToInsertBefore = null;
                     }
 
+                    // start comment
                     if ($this->debugMode) {
                         if ($hasPrepend) {
                             if ($nodeToInsertBefore) {
@@ -177,6 +183,7 @@ class SlipStreamService
                         $targetNode->appendChild($node);
                     }
 
+                    // end comment
                     if ($this->debugMode) {
                         if ($hasPrepend) {
                             if ($nodeToInsertBefore) {
@@ -210,6 +217,6 @@ class SlipStreamService
             libxml_use_internal_errors($useInternalErrorsBackup);
         }
 
-        return $alteredHtml;
+        return $hasHtmlDoctype ? self::HTML_DOCTYPE . $alteredHtml : $alteredHtml ;
     }
 }
