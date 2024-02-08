@@ -100,6 +100,8 @@ class SlipStreamService
                 $target = $node->getAttribute('data-slipstream');
                 if (empty($target)) {
                     $target = '//head';
+                } else if (str_starts_with($target, '#')) {
+                    $target = '//*[@id="' . substr($target, 1) . '"]';
                 }
 
                 $prepend = $node->hasAttribute('data-slipstream-prepend');

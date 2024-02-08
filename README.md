@@ -46,6 +46,15 @@ and inserted. This is enabled in Development Context by default.
 If the setting `Sitegeist.Slipstream.removeSlipstreamAttributes` is enabled, the attributes from slipstream get removed. 
 This is disabled in Development Context by default.
 
+### Using CSS selector id as target
+
+If you want to target a specific element with an id you can also use a CSS target selector.
+Be aware, no other selectors types are implemented.
+
+ ```html
+     <dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
+ ```
+
 ## Inner working and performance
 
 The slipstream HTTP middleware will modify all responses with an active `X-Slipstream: Enabled` HTTP header.
