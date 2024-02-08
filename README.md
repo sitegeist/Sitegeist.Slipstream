@@ -52,7 +52,7 @@ If you want to target a specific element with an id you can also use a CSS targe
 Be aware, no other selectors types are implemented.
 
  ```html
-     <dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
+<dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
  ```
 
 ## Inner working and performance
