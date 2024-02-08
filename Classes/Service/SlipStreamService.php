@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\Slipstream\Service;
 
 use Neos\Flow\Annotations as Flow;
@@ -7,7 +8,6 @@ use GuzzleHttp\Psr7\Utils;
 
 class SlipStreamService
 {
-
     /**
      * @var bool
      * @Flow\InjectConfiguration(path="debugMode")
@@ -25,6 +25,8 @@ class SlipStreamService
 
     protected const AT_CHARACTER_SEARCH = ' @';
 
+    protected const HTML_DOCTYPE = '<!DOCTYPE html>';
+
     /**
      * Modify the given response and return a new one with the data-slipstream elements moved to
      * the target location
@@ -36,12 +38,36 @@ class SlipStreamService
     {
         $html = $response->getBody()->getContents();
 
+        $alteredHtml = $this->processHtml($html);
+
+        if (is_null($alteredHtml)) {
+            $response->getBody()->rewind();
+            return $response;
+        }
+
+        $response = $response->withBody(Utils::streamFor($alteredHtml));
+        if (!$this->debugMode) {
+            $response = $response->withoutHeader('X-Slipstream');
+        }
+
+        return $response;
+    }
+
+    public function processHtml(string $html): ?string
+    {
+        if (!str_contains($html, 'data-slipstream')) {
+            return null;
+        }
+
         // Starting with Neos 7.3 it is possible to have attributes with @ (e.g. @click).
         // This replacement preserves attributes with @ character
         $html = str_replace(self::AT_CHARACTER_SEARCH, self::AT_CHARACTER_REPLACEMENT, $html);
 
-        // detect xml or html declaration
-        $hasXmlDeclaration = (substr($html, 0, 5) === '<?xml') || (substr($html, 0, 15) === '<!DOCTYPE html>');
+        // detect html doctype
+        $hasHtmlDoctype = substr($html, 0, 15) === self::HTML_DOCTYPE;
+
+        // detect xml declaration
+        $hasXmlDeclaration = substr($html, 0, 5) === '<?xml';
 
         // ignore xml parsing errors
         $useInternalErrorsBackup = libxml_use_internal_errors(true);
@@ -51,113 +77,146 @@ class SlipStreamService
 
         // in case of parsing errors return original body
         if (!$success) {
-            $response->getBody()->rewind();
-            return $response;
+            if ($useInternalErrorsBackup !== true) {
+                libxml_use_internal_errors($useInternalErrorsBackup);
+            }
+            return null;
         }
 
         $xPath = new \DOMXPath($domDocument);
 
         $sourceNodes = $xPath->query("//*[@data-slipstream]");
-        $nodesByTargetAndContentHash = [];
-        foreach ($sourceNodes as $node) {
+        if ($sourceNodes instanceof \DOMNodeList) {
+            $nodesByTargetAndContentHash = [];
+
             /**
-             * @var \DOMNode $node
+             * @var \DOMElement $node
              */
-            $content = $domDocument->saveHTML($node);
-            $target = $node->getAttribute('data-slipstream');
-            if (empty($target)) {
-                $target = '//head';
+            foreach ($sourceNodes as $node) {
+                /**
+                 * @var string $content
+                 */
+                $content = $domDocument->saveHTML($node);
+                $target = $node->getAttribute('data-slipstream');
+                if (empty($target)) {
+                    $target = '//head';
+                }
+
+                $prepend = $node->hasAttribute('data-slipstream-prepend');
+                $contentHash = md5($content);
+
+                /**
+                 * @var \DOMElement $clone
+                 */
+                $clone = $node->cloneNode(true);
+                if ($this->removeAttributes) {
+                    $clone->removeAttribute('data-slipstream');
+                    $clone->removeAttribute('data-slipstream-prepend');
+                }
+                $nodesByTargetAndContentHash[$target][$contentHash] = [
+                    'prepend' => $prepend,
+                    'node' => $clone
+                ];
+
+                /**
+                 * @var \DOMElement $parentNode
+                 */
+                $parentNode =  $node->parentNode;
+                // in debug mode leave a comment behind
+                if ($this->debugMode) {
+                    $comment = $domDocument->createComment(' ' . $content . ' ');
+                    $parentNode->insertBefore($comment, $node);
+                }
+
+                $parentNode->removeChild($node);
             }
 
-            $prepend = $node->hasAttribute('data-slipstream-prepend');
-            $contentHash = md5($content);
-            $clone = $node->cloneNode(true);
-            if ($this->removeAttributes) {
-                $clone->removeAttribute('data-slipstream');
-                $clone->removeAttribute('data-slipstream-prepend');
-            }
-            $nodesByTargetAndContentHash[$target][$contentHash] = [
-                'prepend' => $prepend,
-                'node' => $clone
-            ];
 
-            // in debug mode leave a comment behind
-            if ($this->debugMode) {
-                $comment = $domDocument->createComment(' ' . $content . ' ');
-                $node->parentNode->insertBefore($comment, $node);
-            }
+            foreach ($nodesByTargetAndContentHash as $targetPath => $configurations) {
+                $query = $xPath->query($targetPath);
+                if ($query && $query->count()) {
+                    /**
+                     * @var \DOMElement $targetNode
+                     */
+                    $targetNode = $query->item(0);
 
-            $node->parentNode->removeChild($node);
-        }
+                    $prepend = [];
+                    $append = [];
+                    foreach ($configurations as $config) {
+                        if ($config['prepend']) {
+                            $prepend[] = $config['node'];
+                        } else {
+                            $append[] = $config['node'];
+                        }
+                    }
+                    $hasPrepend = count($prepend);
+                    $hasAppend = count($append);
 
-        foreach ($nodesByTargetAndContentHash as $targetPath => $configurations) {
-            $query = $xPath->query($targetPath);
-            if ($query && $query->count()) {
-                $targetNode = $query->item(0);
-
-                $prepend = [];
-                $append = [];
-                foreach ($configurations as $config) {
-                    if ($config['prepend']) {
-                        $prepend[] = $config['node'];
+                    if ($hasPrepend) {
+                        $nodeToInsertBefore = $targetNode->firstChild;
                     } else {
-                        $append[] = $config['node'];
+                        $nodeToInsertBefore = null;
                     }
-                }
-                $hasPrepend = count($prepend);
-                $hasAppend = count($append);
 
-                if ($hasPrepend) {
-                    $firstChildNode = $targetNode->firstChild;
-                }
-
-                if ($this->debugMode) {
-                    $comment = 'slipstream-for: ' . $targetPath . ' ';
-                    if ($hasPrepend) {
-                        $targetNode->insertBefore($domDocument->createComment($comment . 'prepend begin'), $firstChildNode);
+                    // start comment
+                    if ($this->debugMode) {
+                        if ($hasPrepend) {
+                            if ($nodeToInsertBefore) {
+                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend begin'), $nodeToInsertBefore);
+                            } else {
+                                $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend begin'));
+                            }
+                        }
+                        if ($hasAppend) {
+                            $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' begin'));
+                        }
                     }
-                    if ($hasAppend) {
-                        $targetNode->appendChild($domDocument->createComment($comment . 'begin'));
-                    }
-                }
 
-                foreach ($prepend as $node) {
-                    $targetNode->insertBefore($node, $firstChildNode);
-                }
-                foreach ($append as $node) {
-                    $targetNode->appendChild($node);
-                }
-
-                if ($this->debugMode) {
-                    if ($hasPrepend) {
-                        $targetNode->insertBefore($domDocument->createComment($comment . 'prepend end'), $firstChildNode);
+                    foreach ($prepend as $node) {
+                        if ($nodeToInsertBefore) {
+                            $targetNode->insertBefore($node, $nodeToInsertBefore);
+                        } else {
+                            $targetNode->appendChild($node);
+                        }
                     }
-                    if ($hasAppend) {
-                        $targetNode->appendChild($domDocument->createComment($comment . 'end'));
+                    foreach ($append as $node) {
+                        $targetNode->appendChild($node);
+                    }
+
+                    // end comment
+                    if ($this->debugMode) {
+                        if ($hasPrepend) {
+                            if ($nodeToInsertBefore) {
+                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend end'), $nodeToInsertBefore);
+                            } else {
+                                $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend end'));
+                            }
+                        }
+                        if ($hasAppend) {
+                            $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' end'));
+                        }
                     }
                 }
             }
         }
 
         if ($hasXmlDeclaration) {
-            $alteredBody = $domDocument->saveHTML();
+            $alteredHtml = $domDocument->saveHTML();
         } else {
-            $alteredBody = $domDocument->saveHTML($domDocument->documentElement);
+            $alteredHtml = $domDocument->saveHTML($domDocument->documentElement);
+        }
+
+        if ($alteredHtml === false) {
+            return null;
         }
 
         // Replace the interal @ character with the original one
-        $alteredBody = str_replace(self::AT_CHARACTER_REPLACEMENT, self::AT_CHARACTER_SEARCH, $alteredBody);
+        $alteredHtml = str_replace(self::AT_CHARACTER_REPLACEMENT, self::AT_CHARACTER_SEARCH, $alteredHtml);
 
-        $response = $response->withBody(Utils::streamFor($alteredBody));
-        if (!$this->debugMode) {
-            $response = $response->withoutHeader('X-Slipstream');
-        }
-
-        // restore previous parsing behavior
         if ($useInternalErrorsBackup !== true) {
             libxml_use_internal_errors($useInternalErrorsBackup);
         }
 
-        return $response;
+        return $hasHtmlDoctype ? self::HTML_DOCTYPE . $alteredHtml : $alteredHtml ;
     }
 }
