@@ -27,22 +27,39 @@ The slipstream middleware will parse the entire page and detect all those tags. 
 original location and are appended to the header. Every tag is added only once, so if multiple components require the
 same JS, only one is added to the given location.
 
-By defining the `data-slipstream` attribute with an XPath, the target can be altered.
+### Alter target by tag name
+
+By defining the `data-slipstream` attribute with an tag name, the target can be altered.
 
 ```html
-<script data-slipstream="//body" src="yourCustomScript.js"></script>
-<div>your component</div>
+    <script data-slipstream="body" src="yourCustomScript.js"></script>
+    <div>your component</div>
 ```
+
+### Using CSS selector id as target
+
+If you want to target a specific element with an id you can also use a id selector prefixed with an `#`.
+
+ ```html
+<dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
+ ```
+
+### Prepend the tag
 
 To prepend the tag to the given target, you can add the `data-slipstream-prepend` attribute:
 
 ```html
-<script data-slipstream="//body" data-slipstream-prepend src="yourCustomScriptAfterOpenendBody.js"></script>
+<script data-slipstream="body" data-slipstream-prepend src="yourCustomScriptAfterOpenendBody.js"></script>
 <script data-slipstream data-slipstream-prepend src="yourCustomScriptAfterOpenendHead.js"></script>
 ```
 
+### Debug mode
+
 When the setting `Sitegeist.Slipstream.debugMode` is enabled, HTML comments are rendered to mark where tags were removed
 and inserted. This is enabled in Development Context by default.
+
+### Remove slipstream attributes
+
 If the setting `Sitegeist.Slipstream.removeSlipstreamAttributes` is enabled, the attributes from slipstream get removed.
 This is disabled in Development Context by default.
 
