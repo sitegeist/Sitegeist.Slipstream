@@ -32,13 +32,13 @@ same JS, only one is added to the given location.
 By defining the `data-slipstream` attribute with an tag name, the target can be altered.
 
 ```html
-    <script data-slipstream="//body" src="yourCustomScript.js"></script>
-    <div>your component</div>
+<script data-slipstream="//body" src="yourCustomScript.js"></script>
+<div>your component</div>
 ```
 
 ### Using CSS selector (id or class name) as target
 
-If you want to target a specific element with an id or classname you can also use a selector prefixed with an `#` (id)
+If you want to target a specific element with an id or class name you can also use a selector prefixed with an `#` (id)
 or an `.` (class name). The string itself musst start with a letter, underscore or hyphen. No spaces are allowed. Also
 multiple id and classes combinations won't work, only a single class name or id works.
 
