@@ -44,6 +44,12 @@ If you want to target a specific element with an id you can also use a id select
 <dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
  ```
 
+ ### Using XPATH selector as target
+
+ ```html
+<script data-slipstream="//script[@defer]" src="yourCustomScript.js"></script>
+ ```
+
 ### Prepend the tag
 
 To prepend the tag to the given target, you can add the `data-slipstream-prepend` attribute:
