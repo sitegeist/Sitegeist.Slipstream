@@ -51,7 +51,7 @@ If you want to target a specific element with an id or classname you can also us
 <script data-slipstream="//script[@defer]" src="yourCustomScript.js"></script>
  ```
 
-### Prepend a tag
+### Location of the tag
 
 To prepend the tag to the given target, you can add the `data-slipstream-prepend` attribute:
 
