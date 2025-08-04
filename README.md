@@ -32,30 +32,31 @@ same JS, only one is added to the given location.
 By defining the `data-slipstream` attribute with an tag name, the target can be altered.
 
 ```html
-    <script data-slipstream="body" src="yourCustomScript.js"></script>
+    <script data-slipstream="//body" src="yourCustomScript.js"></script>
     <div>your component</div>
 ```
 
-### Using CSS selector id as target
+### Using CSS selector (id or class name) as target
 
-If you want to target a specific element with an id you can also use a id selector prefixed with an `#`.
+If you want to target a specific element with an id or classname you can also use a selector prefixed with an `#` (id) or an `.` (class name). The string itself musst start with a letter, underscore or hyphen. No spaces are allowed.
 
  ```html
-<dialog data-slipstream="#target"><p>Greetings, one and all!</p></dialog>
+<dialog data-slipstream="#bar"><p>Greetings, one and all!</p></dialog>
+<dialog data-slipstream=".foo"><p>Greetings, one and all!</p></dialog>
  ```
 
- ### Using XPATH selector as target
+### Using XPATH selector as target
 
  ```html
 <script data-slipstream="//script[@defer]" src="yourCustomScript.js"></script>
  ```
 
-### Prepend the tag
+### Prepend a tag
 
 To prepend the tag to the given target, you can add the `data-slipstream-prepend` attribute:
 
 ```html
-<script data-slipstream="body" data-slipstream-prepend src="yourCustomScriptAfterOpenendBody.js"></script>
+<script data-slipstream="//body" data-slipstream-prepend src="yourCustomScriptAfterOpenendBody.js"></script>
 <script data-slipstream data-slipstream-prepend src="yourCustomScriptAfterOpenendHead.js"></script>
 ```
 

@@ -97,13 +97,12 @@ class SlipStreamService
                  * @var string $content
                  */
                 $content = $domDocument->saveHTML($node);
-                $target = $node->getAttribute('data-slipstream');
-                if (empty($target)) {
-                    $target = '//head';
-                } elseif (str_starts_with($target, '#')) {
-                    $target = '//*[@id="' . substr($target, 1) . '"]';
-                } elseif (!str_starts_with($target, '//')) {
-                    $target = '//' . $target;
+                $target = trim($node->getAttribute('data-slipstream')) ?: '//head';
+
+                if (preg_match('/^#([a-zA-Z_-][a-zA-Z0-9_-]*)$/', $target) === 1) {
+                    $target = sprintf('//*[@id="%s"]', substr($target, 1));
+                } elseif (preg_match('/^\.([a-zA-Z_-][a-zA-Z0-9_-]*)$/', $target) === 1) {
+                    $target = sprintf('//*[contains(concat(" ",normalize-space(@class)," ")," %s ")]', substr($target, 1));
                 }
 
                 $mode = 'append';
