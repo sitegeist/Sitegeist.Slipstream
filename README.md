@@ -59,6 +59,14 @@ To prepend the tag to the given target, you can add the `data-slipstream-prepend
 <script data-slipstream data-slipstream-prepend src="yourCustomScriptAfterOpenendHead.js"></script>
 ```
 
+To place a tag before or after a specific tag, you can add the `data-slipstream-before` or
+`data-slipstream-after` attribute:
+
+```html
+<script data-slipstream="//script[@defer]" data-slipstream-before src="yourCustomScript.js" defer></script>
+<script data-slipstream="//script[@defer]" data-slipstream-after src="yourCustomScript.js"></script>
+```
+
 ### Debug mode
 
 When the setting `Sitegeist.Slipstream.debugMode` is enabled, HTML comments are rendered to mark where tags were removed
