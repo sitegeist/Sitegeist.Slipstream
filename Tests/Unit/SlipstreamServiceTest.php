@@ -269,13 +269,13 @@ class SlipstreamServiceTest extends TestCase
     /**
      * @test
      */
-    public function classNameSelector() {
+    public function classNameSelectorAndTargetIsTrimmed() {
         $service = $this->createService();
         $input = <<<EOF
             <html>
                 <head></head>
                 <body>
-                    foo<div data-slipstream=".foo">slipped content</div>bar
+                    foo<div data-slipstream="  .foo  ">slipped content</div>bar
                     <div class="foo"></div>
                 </body>
             </html>
@@ -285,7 +285,17 @@ class SlipstreamServiceTest extends TestCase
                 <head></head>
                 <body>
                     foobar
-                    <div class="foo"><div data-slipstream=".foo">slipped content</div></div>
+                    <div class="foo"><div data-slipstream="  .foo  ">slipped content</div></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
                 </body>
             </html>
             EOF;
