@@ -38,7 +38,9 @@ By defining the `data-slipstream` attribute with an tag name, the target can be 
 
 ### Using CSS selector (id or class name) as target
 
-If you want to target a specific element with an id or classname you can also use a selector prefixed with an `#` (id) or an `.` (class name). The string itself musst start with a letter, underscore or hyphen. No spaces are allowed.
+If you want to target a specific element with an id or classname you can also use a selector prefixed with an `#` (id)
+or an `.` (class name). The string itself musst start with a letter, underscore or hyphen. No spaces are allowed. Also
+multiple id and classes combinations won't work, only a single class name or id works.
 
  ```html
 <dialog data-slipstream="#bar"><p>Greetings, one and all!</p></dialog>
