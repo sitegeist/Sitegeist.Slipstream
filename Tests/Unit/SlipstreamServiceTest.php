@@ -266,6 +266,68 @@ class SlipstreamServiceTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function classNameSelector() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream=".foo">slipped content</div>bar
+                    <div class="foo"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div class="foo"><div data-slipstream=".foo">slipped content</div></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function idSelector() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="#foo">slipped content</div>bar
+                    <div id="foo"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div id="foo"><div data-slipstream="#foo">slipped content</div></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
 
     public function createService(bool $debugMode = false, bool $removeAttributes = false): SlipStreamService
     {
