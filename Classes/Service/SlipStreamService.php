@@ -102,7 +102,15 @@ class SlipStreamService
                     $target = '//head';
                 }
 
-                $prepend = $node->hasAttribute('data-slipstream-prepend');
+                $mode = 'append';
+                if ($node->hasAttribute('data-slipstream-prepend')) {
+                    $mode = 'prepend';
+                } elseif ($node->hasAttribute('data-slipstream-before')) {
+                    $mode = 'before';
+                } elseif ($node->hasAttribute('data-slipstream-after')) {
+                    $mode = 'after';
+                }
+
                 $contentHash = md5($content);
 
                 /**
@@ -112,9 +120,11 @@ class SlipStreamService
                 if ($this->removeAttributes) {
                     $clone->removeAttribute('data-slipstream');
                     $clone->removeAttribute('data-slipstream-prepend');
+                    $clone->removeAttribute('data-slipstream-before');
+                    $clone->removeAttribute('data-slipstream-after');
                 }
                 $nodesByTargetAndContentHash[$target][$contentHash] = [
-                    'prepend' => $prepend,
+                    'mode' => $mode,
                     'node' => $clone
                 ];
 
@@ -141,31 +151,49 @@ class SlipStreamService
                     $targetNode = $query->item(0);
 
                     $prepend = [];
+                    $before = [];
+                    $after = [];
                     $append = [];
                     foreach ($configurations as $config) {
-                        if ($config['prepend']) {
-                            $prepend[] = $config['node'];
-                        } else {
-                            $append[] = $config['node'];
+                        switch ($config['mode']) {
+                            case 'prepend':
+                                $prepend[] = $config['node'];
+                                break;
+
+                            case 'before':
+                                $before[] = $config['node'];
+                                break;
+
+                            case 'after':
+                                $after[] = $config['node'];
+                                break;
+
+                            default:
+                                $append[] = $config['node'];
+                                break;
                         }
                     }
                     $hasPrepend = count($prepend);
+                    $hasBefore = count($before);
+                    $hasAfter = count($after);
                     $hasAppend = count($append);
 
-                    if ($hasPrepend) {
-                        $nodeToInsertBefore = $targetNode->firstChild;
-                    } else {
-                        $nodeToInsertBefore = null;
-                    }
+                    $prependNode = $hasPrepend ? $targetNode->firstChild : null;
 
                     // start comment
                     if ($this->debugMode) {
                         if ($hasPrepend) {
-                            if ($nodeToInsertBefore) {
-                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend begin'), $nodeToInsertBefore);
+                            if ($prependNode) {
+                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend begin'), $prependNode);
                             } else {
                                 $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend begin'));
                             }
+                        }
+                        if ($hasBefore) {
+                            $targetNode->before($domDocument->createComment('slipstream-for: ' . $targetPath . ' before begin'));
+                        }
+                        if ($hasAfter) {
+                            $targetNode->after($domDocument->createComment('slipstream-for: ' . $targetPath . ' after end'));
                         }
                         if ($hasAppend) {
                             $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' begin'));
@@ -173,11 +201,17 @@ class SlipStreamService
                     }
 
                     foreach ($prepend as $node) {
-                        if ($nodeToInsertBefore) {
-                            $targetNode->insertBefore($node, $nodeToInsertBefore);
+                        if ($prependNode) {
+                            $targetNode->insertBefore($node, $prependNode);
                         } else {
                             $targetNode->appendChild($node);
                         }
+                    }
+                    foreach ($before as $node) {
+                        $targetNode->before($node);
+                    }
+                    foreach ($after as $node) {
+                        $targetNode->after($node);
                     }
                     foreach ($append as $node) {
                         $targetNode->appendChild($node);
@@ -186,11 +220,17 @@ class SlipStreamService
                     // end comment
                     if ($this->debugMode) {
                         if ($hasPrepend) {
-                            if ($nodeToInsertBefore) {
-                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend end'), $nodeToInsertBefore);
+                            if ($prependNode) {
+                                $targetNode->insertBefore($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend end'), $prependNode);
                             } else {
                                 $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' prepend end'));
                             }
+                        }
+                        if ($hasAfter) {
+                            $targetNode->after($domDocument->createComment('slipstream-for: ' . $targetPath . ' after start'));
+                        }
+                        if ($hasBefore) {
+                            $targetNode->before($domDocument->createComment('slipstream-for: ' . $targetPath . ' before end'));
                         }
                         if ($hasAppend) {
                             $targetNode->appendChild($domDocument->createComment('slipstream-for: ' . $targetPath . ' end'));
