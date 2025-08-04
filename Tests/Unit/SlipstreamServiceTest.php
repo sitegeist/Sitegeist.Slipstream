@@ -390,6 +390,77 @@ class SlipstreamServiceTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function afterLocation() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="//main" data-slipstream-after>slipped content</div>bar
+                    <div>Some content</div>
+                    <main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div>Some content</div>
+                    <main></main><div data-slipstream="//main" data-slipstream-after>slipped content</div>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function beforeLocation() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="//main" data-slipstream-before>slipped content</div>bar
+                    <div>Some content</div>
+                    <main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div>Some content</div>
+                    <div data-slipstream="//main" data-slipstream-before>slipped content</div><main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+
     public function createService(bool $debugMode = false, bool $removeAttributes = false): SlipStreamService
     {
         $service = new SlipStreamService();
