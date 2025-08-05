@@ -266,6 +266,200 @@ class SlipstreamServiceTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function classNameSelectorAndTargetIsTrimmed() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="  .foo  ">slipped content</div>bar
+                    <div class="foo"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div class="foo"><div data-slipstream="  .foo  ">slipped content</div></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function invalidClassNameSelector() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream=".foo.bar">slipped content</div>bar
+                    <div class="foo bar"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div class="foo bar"></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function idSelector() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="#foo">slipped content</div>bar
+                    <div id="foo"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div id="foo"><div data-slipstream="#foo">slipped content</div></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function invalidIdSelector() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="#foo.bar">slipped content</div>bar
+                    <div id="foo" class="bar"></div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div id="foo" class="bar"></div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function afterLocation() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="//main" data-slipstream-after>slipped content</div>bar
+                    <div>Some content</div>
+                    <main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div>Some content</div>
+                    <main></main><div data-slipstream="//main" data-slipstream-after>slipped content</div>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function beforeLocation() {
+        $service = $this->createService();
+        $input = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foo<div data-slipstream="//main" data-slipstream-before>slipped content</div>bar
+                    <div>Some content</div>
+                    <main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+        $output = <<<EOF
+            <html>
+                <head></head>
+                <body>
+                    foobar
+                    <div>Some content</div>
+                    <div data-slipstream="//main" data-slipstream-before>slipped content</div><main></main>
+                    <div>Some additional content</div>
+                </body>
+            </html>
+            EOF;
+
+        $result = $service->processHtml($input);
+        $this->assertSame(
+            $output,
+            $result
+        );
+    }
+
 
     public function createService(bool $debugMode = false, bool $removeAttributes = false): SlipStreamService
     {
